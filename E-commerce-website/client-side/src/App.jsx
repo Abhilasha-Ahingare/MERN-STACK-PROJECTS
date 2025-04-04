@@ -10,6 +10,8 @@ import CollectionPage from "./Pages/collectionPage";
 import ProductsDetails from "./componets/products/ProductsDetails";
 import CheckOut from "./componets/cart/CheckOut";
 import OderConformationPage from "./Pages/OderConformationPage";
+import OrderDetailsPage from "./Pages/OrderDetailsPage";
+import MyOrderPage from "./Pages/MyOrderPage";
 
 function App() {
   return (
@@ -30,7 +32,8 @@ function App() {
               path="order-conformation"
               element={<OderConformationPage />}
             />
-            
+            <Route path="order/:id" element={<OrderDetailsPage />} />
+            <Route path="my-orders" element={<MyOrderPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
