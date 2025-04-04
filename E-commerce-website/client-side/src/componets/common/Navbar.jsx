@@ -33,7 +33,7 @@ const Navbar = () => {
         {/* left -nav bars */}
         <div className="hidden md:flex space-x-6">
           <Link
-            to="#"
+            to="/collection/all"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             men's
@@ -107,7 +107,7 @@ const Navbar = () => {
           <h2 className="text-xl font-semibold mb-4 uppercase">menu</h2>
           <nav className=" space-y-4">
             <Link
-              to="#"
+              to="/collection/all"
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black uppercase"
             >
