@@ -8,6 +8,7 @@ import Register from "./Pages/Register";
 import Profile from "./Pages/Profile";
 import CollectionPage from "./Pages/collectionPage";
 import ProductsDetails from "./componets/products/ProductsDetails";
+import CheckOut from "./componets/cart/CheckOut";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="collection/:collection" element={<CollectionPage />} />
             <Route path="product/:id" element={<ProductsDetails />} />
+            <Route path="checkout" element={<CheckOut />} />
           </Route>
         </Routes>
       </BrowserRouter>
