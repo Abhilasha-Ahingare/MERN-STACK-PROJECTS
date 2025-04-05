@@ -66,6 +66,12 @@ const Navbar = () => {
 
         {/* right-icons */}
         <div className="flex items-center space-x-4">
+          <Link
+            to="/admin"
+            className="block bg-black px-2 rounded text-sm text-white"
+          >
+            Admin
+          </Link>
           <Link to="/profile" className="hover:text-black">
             <HiOutlineUser className="h-6 w-6 text-gray-700" />{" "}
           </Link>
@@ -74,10 +80,10 @@ const Navbar = () => {
             className="relative hover:text-black"
           >
             <HiOutlineShoppingBag className="h-6 w-6 text-gray-700" />
-          </button>
-          <span className=" absolute bg-red-800 text-white rounded-full px-2 text-center ">
+          <span className=" absolute  -top-3 bg-red-800 text-white rounded-full px-2 text-center ">
             4
           </span>
+          </button>
 
           {/* search */}
           <div className=" overflow-hidden">

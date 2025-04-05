@@ -60,8 +60,8 @@ const CheckOut = () => {
                   <label className="block text-gray-700 uppercase">email</label>
                   <input
                     type="email"
+                    value="sb-vkyiu39709849@business.example.com"
                     placeholder="enter your email"
-                    value="jhvj@bvvjb.com"
                     className="w-full p-2 border rounded"
                     disabled
                   />
