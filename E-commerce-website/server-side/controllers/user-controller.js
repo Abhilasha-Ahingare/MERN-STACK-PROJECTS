@@ -27,7 +27,7 @@ const registration = async (req, res) => {
     }
 
     // create jwt palyload
-    const palyload = { user: { _id: newUser._id, role: newUser.role } };
+    const palyload = { user: { id: newUser._id, role: newUser.role } };
 
     jwt.sign(
       palyload,
@@ -74,7 +74,7 @@ const login = async (req, res) => {
     }
 
     // create jwt payload
-    const palyload = { user: { _id: userExists._id, role: userExists.role } };
+    const palyload = { user: { id: userExists._id, role: userExists.role } };
 
     jwt.sign(
       palyload,
