@@ -1,7 +1,5 @@
-// const user = require("../model/user-model");
 
 const admin = (req, res, next) => {
-  console.log("user data", req.user);
   // Check if req.user is an array and get the first user
   const currentUser = Array.isArray(req.user) ? req.user[0] : req.user;
 
