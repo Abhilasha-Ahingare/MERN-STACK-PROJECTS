@@ -11,6 +11,7 @@ const uploadRouter = require("./router/UpLoad-router.js");
 const subscriberRouter = require("./router/subscriber-router.js");
 const adminRouter = require("./router/admin-router.js");
 const ProductAdminRouter = require("./router/productAdmin-router.js");
+const AdminOrderRouter = require("./router/adminOrder-router.js");
 
 
 const app = express();
@@ -27,9 +28,8 @@ app.use("/api/subsctiber", subscriberRouter);
 
 //admin router
 app.use("/api/admin", adminRouter);
-
-//admin product router
-app.use("/api/admin/products",ProductAdminRouter );
+app.use("/api/admin/products", ProductAdminRouter);
+app.use("/api/admin/orders", AdminOrderRouter);
 
 const PORT = process.env.PORT || 4000;
 
