@@ -1,6 +1,5 @@
 const cart = require("../model/cart");
 const Checkout = require("../model/CheckOut-model");
-const ProductModel = require("../model/Product-model");
 const order = require("../model/Order-model");
 
 //new checkout session
