@@ -11,6 +11,7 @@ const {
   BestSeller,
   NewArrivals,
 } = require("../controllers/product-controller");
+
 const admin = require("../middleware/Admin-middleware");
 
 // Define routes
