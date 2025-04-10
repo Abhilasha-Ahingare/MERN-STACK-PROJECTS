@@ -10,7 +10,7 @@ const {
 
 const router = express.Router();
 router.post("/", cartItem);
-router.post("/merge-cart",protect, MergeCart);
+router.post("/merge-cart", protect, MergeCart);
 router.put("/", CartPut);
 router.delete("/", CartDelete);
 router.get("/", GetCart);
