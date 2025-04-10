@@ -19,9 +19,13 @@ import ProductMangement from "./componets/admin/ProductMangement";
 import EditProductPage from "./componets/admin/EditProductPage";
 import OrderManagement from "./componets/admin/OrderManagement";
 
+import {Provider} from "react-redux"
+import store from "./redux/store";
+
 function App() {
   return (
     <>
+    <Provider store={store}>
       <BrowserRouter
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
@@ -29,7 +33,7 @@ function App() {
           <Route path="/" element={<UserLayout />}>
             <Route index element={<Home />} />
             <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
+            <Route path="registration" element={<Register />} />
             <Route path="profile" element={<Profile />} />
             <Route path="collection/:collection" element={<CollectionPage />} />
             <Route path="product/:id" element={<ProductsDetails />} />
@@ -51,6 +55,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      </Provider>
     </>
   );
 }

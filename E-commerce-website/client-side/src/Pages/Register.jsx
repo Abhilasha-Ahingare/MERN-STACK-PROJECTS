@@ -1,15 +1,20 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { registrationUser } from "../redux/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const Register = () => {
-  const [username, setUsername] = useState("");
+  const [name, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("form submited")
+    dispatch(registrationUser({ name, email, password }));
+    navigate("/login");
   };
 
   return (
@@ -28,17 +33,14 @@ const Register = () => {
 
         <div className="space-y-4">
           <div className="mb-4">
-            <label
-              htmlFor="username"
-              className="block text-sm font-semibold mb-2"
-            >
+            <label htmlFor="name" className="block text-sm font-semibold mb-2">
               Username
             </label>
             <input
               type="text"
-              value={username}
-              name="username"
-              id="username"
+              value={name}
+              name="name"
+              id="name"
               placeholder="Enter Your name"
               autoComplete="new-password"
               onChange={(e) => setUsername(e.target.value)}

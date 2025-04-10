@@ -72,12 +72,11 @@ const login = async (req, res) => {
     if (!comparePassword) {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
-
-    // create jwt payload
-    const palyload = { user: { id: userExists._id, role: userExists.role } };
+    
+    const payload = { user: { id: userExists._id, role: userExists.role } };
 
     jwt.sign(
-      palyload,
+      payload,
       process.env.JWT_SECRET_KEY,
       { expiresIn: "6h" },
       (err, token) => {
@@ -98,10 +97,11 @@ const login = async (req, res) => {
   } catch (error) {
     console.error("login error:", error);
     res.status(500).json({
-      message: error.message || "Internal server error during registration",
+      message: error.message || "Internal server error during login",
     });
   }
 };
+
 
 //user profile
 const profile = async (req, res) => {

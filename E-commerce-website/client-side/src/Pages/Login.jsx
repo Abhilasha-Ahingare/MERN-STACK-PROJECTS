@@ -1,13 +1,19 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import loginimg from "../assets/iamges/img1.jpg";
+import { loginUser } from "../redux/slices/authSlice";
+import { useDispatch } from "react-redux";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("form submited");
+    dispatch(loginUser({ email, password }));
+    navigate("/");
   };
   return (
     <div className="flex h-screen w-full">
@@ -72,7 +78,7 @@ const Login = () => {
             <p className="mt-6 text-center text-sm uppercase">
               {" "}
               don't have an account ?
-              <Link to="/register" className="text-blue-500 uppercase">
+              <Link to="/registration" className="text-blue-500 uppercase">
                 register
               </Link>
             </p>
