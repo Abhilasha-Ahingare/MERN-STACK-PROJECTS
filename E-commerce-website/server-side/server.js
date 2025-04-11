@@ -31,7 +31,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api/admin/products", ProductAdminRouter);
 app.use("/api/admin/orders", AdminOrderRouter);
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {

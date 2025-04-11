@@ -1,50 +1,10 @@
 import React from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
-const CartContent = () => {
-  const cartProducts = [
-    {
-      productId: 1,
-      name: "t-shirt",
-      size: "m",
-      color: "red",
-      quantity: 1,
-      price: 1500,
-      image: "https://picsum.photos/200?random=1",
-    },
-
-    {
-      productId: 2,
-      name: "jens",
-      size: "s",
-      color: "blue",
-      quantity: 2,
-      price: 1500,
-      image: "https://picsum.photos/200?random=2",
-    },
-
-    {
-      productId: 3,
-      name: "t-shirt",
-      size: "xl",
-      color: "red",
-      quantity: 1,
-      price: 1500,
-      image: "https://picsum.photos/200?random=3",
-    },
-
-    {
-      productId: 4,
-      name: "jens",
-      size: "m",
-      color: "red",
-      quantity: 1,
-      price: 1500,
-      image: "https://picsum.photos/200?random=4",
-    },
-  ];
+const CartContent = ({ cart, guestId, userId }) => {
+  
   return (
     <div>
-      {cartProducts.map((product, index) => (
+      {cart.map((product, index) => (
         <div
           key={index}
           className="flex items-start justify-between py-4 border-b "
@@ -74,7 +34,6 @@ const CartContent = () => {
           <p> price: {product.price.toLocaleString()}</p>
           <button>
             <RiDeleteBin5Line />
-            
           </button>
         </div>
       ))}

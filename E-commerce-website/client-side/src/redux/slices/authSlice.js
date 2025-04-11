@@ -1,19 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-//retrieve user into and token from localstorage if avaliable
+import api from "../../utils/api";
 
 const userFromStorage = localStorage.getItem("userInfo")
   ? JSON.parse(localStorage.getItem("userInfo"))
   : null;
 
-//check for an existing guest id in the localstorage  or generate a new one
-
 const initialGuestId =
   localStorage.getItem("guestId") || `guest_${new Date().getTime()}`;
 localStorage.setItem("guestId", initialGuestId);
-
-//initial state
 
 const initialState = {
   user: userFromStorage,
@@ -22,70 +16,49 @@ const initialState = {
   error: null,
 };
 
-//asyn thunk for user login
-
 export const loginUser = createAsyncThunk(
   "auth/login",
   async (userData, { rejectWithValue }) => {
     try {
-      console.log("🟡 Sending userData to login:", userData);
+      const response = await api.post("/api/auth/login", userData);
+      const { user, token } = response.data;
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/api/auth/login`,
-        userData
-      );
-      console.log("Login response:", response.data);
-      localStorage.setItem("userInfo", JSON.stringify(response.data.user));
-      localStorage.setItem("userToken", response.data.token);
+      localStorage.setItem("userInfo", JSON.stringify(user));
+      localStorage.setItem("userToken", token);
 
-      return response.data.user;
+      return user;
     } catch (error) {
-      console.error("Login error:", error);
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response?.data || { message: "Login failed" }
+      );
     }
   }
 );
-
-//asyn thunk for user registration
 
 export const registrationUser = createAsyncThunk(
   "auth/registration",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/api/auth/registration`,
-        userData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.post("/api/auth/registration", userData);
+      const { user, token } = response.data;
 
-      if (!response.data) {
-        throw new Error("No data received from server");
+      if (!user || !token) {
+        throw new Error("Invalid response structure");
       }
 
-      if (!response.data.user || !response.data.token) {
-        throw new Error("Invalid response structure: missing user or token");
-      }
+      localStorage.setItem("userInfo", JSON.stringify(user));
+      localStorage.setItem("userToken", token);
 
-      localStorage.setItem("userInfo", JSON.stringify(response.data.user));
-      localStorage.setItem("userToken", response.data.token);
-      return response.data.user;
+      return user;
     } catch (error) {
-      console.error("Registration error:", error);
-      let errorMessage;
+      let errorMessage = "Registration failed";
 
       if (error.code === "ERR_NETWORK") {
         errorMessage = "Network error: Unable to connect to the server";
       } else if (error.response?.status === 404) {
-        errorMessage = "Server endpoint not found. Please check the API URL";
+        errorMessage = "Server endpoint not found";
       } else {
-        errorMessage =
-          error.response?.data?.message ||
-          error.message ||
-          "Registration failed. Please try again.";
+        errorMessage = error.response?.data?.message || error.message;
       }
 
       return rejectWithValue({
@@ -96,8 +69,6 @@ export const registrationUser = createAsyncThunk(
     }
   }
 );
-
-//create slice
 
 const authSlice = createSlice({
   name: "auth",

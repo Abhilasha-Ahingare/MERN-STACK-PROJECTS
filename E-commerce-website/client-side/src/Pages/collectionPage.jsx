@@ -1,128 +1,60 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FaFilter } from "react-icons/fa";
+import { BiRefresh } from "react-icons/bi";
 import FilterSideBar from "../componets/products/FilterSideBar";
 import SortOpention from "../componets/products/SortOpention";
 import ProductGrid from "../componets/products/ProductGrid";
+import { useParams, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { FetchProductByFilters } from "../redux/slices/product-Slice";
+import { toast } from "react-toastify";
 
 const CollectionPage = () => {
-  const [products, setProducts] = useState([]);
+  const { productCollection } = useParams();
+  const [searchParams] = useSearchParams();
+  const dispatch = useDispatch();
+  const { product, loading, error } = useSelector((state) => state.product);
+  const queryParams = Object.fromEntries([...searchParams]);
+
   const sidebarRef = useRef(null);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchProducts = async () => {
+    try {
+      await dispatch(
+        FetchProductByFilters({ productCollection, ...queryParams })
+      ).unwrap();
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch products");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [dispatch, productCollection, searchParams]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchProducts();
+    setIsRefreshing(false);
+  };
 
   const toggleSideBar = () => {
     setIsSideBarOpen(!isSideBarOpen);
   };
 
   const handleClickOutSide = (e) => {
-    // close sidebar is clicked outside
     if (sidebarRef.current && !sidebarRef.current.contains(e.target)) {
       setIsSideBarOpen(false);
     }
   };
 
   useEffect(() => {
-    // add event listner for click
     document.addEventListener("mousedown", handleClickOutSide);
-    // remove event listner
     return () => {
       document.removeEventListener("mousedown", handleClickOutSide);
     };
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      const fetchProducts = [
-        {
-          _id: 1,
-          name: "product 1",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=1",
-              altText: "products",
-            },
-          ],
-        },
-        {
-          _id: 2,
-          name: "product 1",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=2",
-              altText: "products",
-            },
-          ],
-        },
-        {
-          _id: 3,
-          name: "product 3",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=3",
-              altText: "products",
-            },
-          ],
-        },
-        {
-          _id: 4,
-          name: "product 1",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=4",
-              altText: "products",
-            },
-          ],
-        },
-        {
-          _id: 5,
-          name: "product 1",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=5",
-              altText: "products",
-            },
-          ],
-        },
-        {
-          _id: 6,
-          name: "product 1",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=6",
-              altText: "products",
-            },
-          ],
-        },
-        {
-          _id: 7,
-          name: "product 1",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=7",
-              altText: "products",
-            },
-          ],
-        },
-        {
-          _id: 8,
-          name: "product 1",
-          price: 100,
-          image: [
-            {
-              url: "https://picsum.photos/500/500?random=8",
-              altText: "products",
-            },
-          ],
-        },
-      ];
-      setProducts(fetchProducts);
-    }, 1000);
   }, []);
 
   return (
@@ -152,15 +84,44 @@ const CollectionPage = () => {
       >
         <FilterSideBar />
       </div>
-      <div className="flex-grow p-4">
-        <h2 className="text-2xl uppercase mb-4">All collection</h2>
 
-        {/* sort option */}
+      <div className="flex-grow p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl uppercase">
+            {productCollection || "All Products"}
+          </h2>
+          {(error || product?.length === 0) && (
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+            >
+              <BiRefresh className={`${isRefreshing ? "animate-spin" : ""}`} />
+              Refresh
+            </button>
+          )}
+        </div>
+
         <SortOpention />
 
-        {/* product gird */}
-
-        <ProductGrid products={products} />
+        {error ? (
+          <div className="text-center py-8">
+            <p className="text-red-500 mb-4">{error}</p>
+            <p className="text-gray-600">Please try refreshing the page</p>
+          </div>
+        ) : loading ? (
+          <div className="flex justify-center items-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+          </div>
+        ) : product?.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-lg text-gray-600">
+              No products found matching your criteria
+            </p>
+          </div>
+        ) : (
+          <ProductGrid products={product} loading={loading} error={error} />
+        )}
       </div>
     </div>
   );

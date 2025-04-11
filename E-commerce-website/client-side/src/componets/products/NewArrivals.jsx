@@ -1,98 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { Link } from "react-router-dom";
-
-const products = [
-  {
-    _id: "1",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=1",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-
-  {
-    _id: "2",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=2",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-  {
-    _id: "3",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=3",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-  {
-    _id: "4",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=4",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-  {
-    _id: "5",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=5",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-  {
-    _id: "6",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=6",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-  {
-    _id: "7",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=7",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-  {
-    _id: "8",
-    name: "stylish jacket",
-    price: 120,
-    images: [
-      {
-        url: "https://picsum.photos/500/500?/random=8",
-        altText: "stylish jacket",
-      },
-    ],
-  },
-];
+import api from "../../utils/api";
 
 const NewArrivals = () => {
   const scrollRef = useRef(null);
@@ -100,8 +9,25 @@ const NewArrivals = () => {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(false);
   const [canScrollleft, setCanScrollleft] = useState(false);
-
+  const [newArrivals, setNewArrivals] = useState([]);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  useEffect(() => {
+    const fetchNewArrivals = async () => {
+      try {
+        const response = await api.get("/api/product/new-arrivals");
+        // Check if response.data is array, if not wrap it in array
+        const products = Array.isArray(response.data)
+          ? response.data
+          : [response.data];
+        setNewArrivals(products);
+      } catch (error) {
+        console.error("Error fetching new arrivals:", error);
+      }
+    };
+
+    fetchNewArrivals();
+  }, []);
 
   const handlerMouseDown = (e) => {
     setIsDraggin(true);
@@ -121,7 +47,7 @@ const NewArrivals = () => {
 
   const scroll = (direction) => {
     const scrollAmount = direction === "left" ? -300 : 300;
-    scrollRef.current.scrollBy({ left: scrollAmount, behaviour: "smooth" });
+    scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
   };
 
   const updateScrollButton = () => {
@@ -193,9 +119,9 @@ const NewArrivals = () => {
         onMouseUp={handlerMouseUpOrLeave}
         onMouseLeave={handlerMouseUpOrLeave}
       >
-        {products.map((products) => (
+        {newArrivals.map((products) => (
           <div
-            key={products._id}
+            key={products?._id}
             className=" min-w-[100%] sm:min-w-[50%] lg:min-w-[30%]  relative"
           >
             <img

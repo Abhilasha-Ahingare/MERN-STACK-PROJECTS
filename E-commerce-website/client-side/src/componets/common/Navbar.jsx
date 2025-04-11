@@ -33,31 +33,31 @@ const Navbar = () => {
         {/* left -nav bars */}
         <div className="hidden md:flex space-x-6">
           <Link
-            to="/collection/all"
+            to="/collection/all?gender=Men"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             men's
           </Link>
           <Link
-            to="#"
+            to="/collection/all?gender=Women"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             women's
           </Link>
           <Link
-            to="#"
+            to="/collection/all?gender=kids"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             kids
           </Link>
           <Link
-            to="#"
+            to="/collection/all?category=Bottom Wear"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             top wear
           </Link>
           <Link
-            to="#"
+            to="/collection/all?category=Tom Wear"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             bottom wear
@@ -80,9 +80,9 @@ const Navbar = () => {
             className="relative hover:text-black"
           >
             <HiOutlineShoppingBag className="h-6 w-6 text-gray-700" />
-          <span className=" absolute  -top-3 bg-red-800 text-white rounded-full px-2 text-center ">
-            4
-          </span>
+            <span className=" absolute  -top-3 bg-red-800 text-white rounded-full px-2 text-center ">
+              4
+            </span>
           </button>
 
           {/* search */}

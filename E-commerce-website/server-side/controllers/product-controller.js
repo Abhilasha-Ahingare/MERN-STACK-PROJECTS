@@ -233,18 +233,27 @@ const sortProducts = async (req, res) => {
       ];
     }
 
-    // sorting logic
+    // Enhanced sorting logic
     let sort = {};
     if (sortBy) {
-      switch (sortBy) {
+      switch (sortBy.toLowerCase()) {
         case "priceAsc":
           sort = { price: 1 };
           break;
-        case "priceDesc":
+        case "priceDsc":
           sort = { price: -1 };
           break;
         case "popularity":
-          sort = { rating: -1 };
+          sort = { rating: -1, numReviews: -1 };
+          break;
+        case "newest":
+          sort = { createdAt: -1 };
+          break;
+        case "nameAsc":
+          sort = { name: 1 };
+          break;
+        case "nameDsc":
+          sort = { name: -1 };
           break;
         default:
           sort = { createdAt: -1 };
@@ -257,15 +266,11 @@ const sortProducts = async (req, res) => {
       .sort(sort)
       .limit(Number(limit || 12));
 
-    return res.status(200).json({
-      success: true,
-      count: products.length,
-      products,
-    });
+    console.log("Found products:", products.length); // Debug log
+    return res.status(200).json(products);
   } catch (error) {
     console.error("Error in sortProducts:", error);
     return res.status(500).json({
-      success: false,
       message: "Error fetching products",
       error: error.message,
     });
@@ -296,17 +301,22 @@ const NewArrivals = async (req, res) => {
 
 const BestSeller = async (req, res) => {
   try {
-    const bestSeller = await Product.findOne().sort({ rating: -1 });
+    const bestSeller = await Product.findOne()
+      .sort({ rating: -1 })
+      .select("name price images color size");
     if (bestSeller) {
       return res
-        .status(404)
-        .json({ message: "here the some best seller product", bestSeller });
+        .status(200)
+        .json({ message: "Here are some best seller products", bestSeller });
     } else {
-      return res.status(404).json({ message: "we not find best seller" });
+      return res
+        .status(404)
+        .json({ message: "We could not find any best seller products" });
     }
   } catch (error) {
     return res.status(500).json({
-      message: "Error BestSeller product not found",
+      message: "Error: Best seller product not found",
+      error: error.message,
     });
   }
 };
@@ -324,7 +334,7 @@ const singleProduct = async (req, res) => {
     const product = await Product.findById(productId).exec();
 
     if (product) {
-      return res.status(200).json({ product });
+      return res.status(200).json( product );
     } else {
       return res
         .status(404)

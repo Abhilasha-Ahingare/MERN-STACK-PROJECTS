@@ -20,8 +20,8 @@ router.put("/:id", protect, admin, updateProduct);
 router.delete("/:id", protect, admin, deleteProduct);
 router.get("/", sortProducts);
 router.get("/new-arrivals", NewArrivals);
-router.get("/best-seller", BestSeller);
-router.get("/:id", singleProduct);
+router.get("/BestSeller", BestSeller);
 router.get("/similar/:id", similarProduct);
+router.get("/:id", singleProduct);
 
 module.exports = router;
