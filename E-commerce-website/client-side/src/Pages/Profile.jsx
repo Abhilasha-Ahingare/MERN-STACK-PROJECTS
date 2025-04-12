@@ -7,7 +7,7 @@ import { clearCart } from "../redux/slices/cartSlice";
 import { useSelector } from "react-redux";
 
 const Profile = () => {
-  const { user } = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth?.user?.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

@@ -13,7 +13,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, guestId } = useSelector((state) => state.auth.user);
+  const { user, guestId } = useSelector((state) => state.auth);
   const { cart } = useSelector((state) => state.cart);
 
   //get redirect parameter and check if it's checkout or something
@@ -34,10 +34,8 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }))
-      .unwrap()
-      .then((result) => {
-        console.log("Login successful:", result);
+    dispatch(login({ email, password })).then((result) => {
+
         if (cart?.products?.length > 0 && guestId) {
           dispatch(margeCart({ guestId, user: result })).then(() => {
             navigate(isCheckoutRedirect ? "/checkout" : "/");
@@ -47,7 +45,6 @@ const Login = () => {
         }
       })
       .catch((error) => {
-        console.error("Login failed:", error);
         alert(error.message || "Login failed. Please try again.");
       });
   };

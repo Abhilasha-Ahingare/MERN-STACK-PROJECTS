@@ -1,26 +1,47 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { register } from "../redux/slices/authSlice";
+import { margeCart } from "../redux/slices/cartSlice"; // Add this import
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const Register = () => {
   const [name, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { user, guestId } = useSelector((state) => state.auth);
+  const { cart } = useSelector((state) => state.cart);
+
+  //get redirect parameter and check if it's checkout or something
+  const redirect = new URLSearchParams(location.search).get("redirect") || "/";
+  const isCheckoutRedirect = redirect.includes("checkout");
+
+  useEffect(() => {
+    if (user) {
+      if (cart?.products?.length > 0 && guestId) {
+        dispatch(margeCart({ guestId, user })).then(() => {
+          navigate(isCheckoutRedirect ? "/checkout" : "/");
+        });
+      } else {
+        navigate(isCheckoutRedirect ? "/checkout" : "/");
+      }
+    }
+  }, [user, guestId, cart, navigate, isCheckoutRedirect, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(register({ name, email, password }))
       .unwrap()
       .then((result) => {
-        console.log("Registration successful:", result);
-        navigate("/login");
+        if (result.success) {
+          navigate("/login");
+        }
       })
       .catch((error) => {
-        console.error("Registration failed:", error);
         alert(error.message || "Registration failed. Please try again.");
       });
   };
@@ -100,7 +121,10 @@ const Register = () => {
           <p className="mt-6 text-center text-sm uppercase">
             {" "}
             DO You have an account ?
-            <Link to="/login" className="text-blue-500 uppercase">
+            <Link
+              to={`/login?redirect=${encodeURIComponent(redirect)}`}
+              className="text-blue-500 uppercase"
+            >
               Login
             </Link>
           </p>

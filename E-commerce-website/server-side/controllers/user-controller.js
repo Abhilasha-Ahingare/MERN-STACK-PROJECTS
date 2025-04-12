@@ -26,19 +26,19 @@ const registration = async (req, res) => {
       });
     }
 
-    // create jwt palyload
-    const palyload = { user: { id: newUser._id, role: newUser.role } };
+    // create jwt payload
+    const payload = { user: { id: newUser._id, role: newUser.role } };
 
     jwt.sign(
-      palyload,
+      payload,
       process.env.JWT_SECRET_KEY,
       { expiresIn: "6h" },
       (err, token) => {
         if (err) throw err;
 
-        // send the user token as respons
+        // Return user data in same format as login
         res.status(201).json({
-          message: "User registered successfully",
+          success: true,
           user: {
             _id: newUser._id,
             name: newUser.name,
@@ -72,7 +72,7 @@ const login = async (req, res) => {
     if (!comparePassword) {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
-    
+
     const payload = { user: { id: userExists._id, role: userExists.role } };
 
     jwt.sign(
@@ -102,15 +102,18 @@ const login = async (req, res) => {
   }
 };
 
-
 //user profile
 const profile = async (req, res) => {
-  res.json(req.User);
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
-
-
-
-
 
 // Export as an object with named functions
 module.exports = { registration, login, profile };

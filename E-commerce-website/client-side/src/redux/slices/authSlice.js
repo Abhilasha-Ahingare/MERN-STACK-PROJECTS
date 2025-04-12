@@ -49,21 +49,9 @@ export const login = createAsyncThunk(
 
 export const register = createAsyncThunk(
   "auth/register",
-  async (userData, { dispatch, getState, rejectWithValue }) => {
+  async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post("/api/auth/register", userData);
-      const guestId = getState().auth.guestId;
-
-      // If we have a guestId and items in guest cart, merge them
-      if (guestId) {
-        try {
-          await dispatch(margeCart({ guestId }));
-          localStorage.removeItem("guestId"); // Clear guestId after successful merge
-        } catch (error) {
-          console.error("Error merging carts:", error);
-        }
-      }
-
+      const response = await api.post("/api/auth/registration", userData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -112,10 +100,10 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(register.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state) => {
         state.loading = false;
-        state.user = action.payload;
-        localStorage.setItem("user", JSON.stringify(action.payload));
+        // Don't set user on registration, let them login
+        state.error = null;
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
