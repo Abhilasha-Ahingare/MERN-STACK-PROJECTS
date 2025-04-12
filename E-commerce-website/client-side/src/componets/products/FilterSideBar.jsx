@@ -17,7 +17,7 @@ const FilterSideBar = () => {
 
   const [priceRange, setPriceRange] = useState(0, 100);
 
-  const categories = ["top wear", "bottom wear"];
+  const categories = ["Top Wear", "Bottom Wear"];
   const color = [
     "red",
     "blue",
@@ -170,7 +170,7 @@ const FilterSideBar = () => {
           <div className="flex items-center mb-1">
             <input
               type="checkbox"
-              name="size"
+              name="sizes"
               value={size}
               onChange={handlerFilterChnage}
               checked={filters.size.includes(size)}
@@ -208,7 +208,7 @@ const FilterSideBar = () => {
           <div className="flex items-center mb-1">
             <input
               type="checkbox"
-              name="brands"
+              name="brand"
               value={brands}
               onChange={handlerFilterChnage}
               checked={filters.brand.includes(brands)}

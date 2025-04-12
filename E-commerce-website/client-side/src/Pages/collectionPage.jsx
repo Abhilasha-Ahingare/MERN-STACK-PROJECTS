@@ -13,16 +13,20 @@ const CollectionPage = () => {
   const { productCollection } = useParams();
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
+
   const { product, loading, error } = useSelector((state) => state.product);
+
   const queryParams = Object.fromEntries([...searchParams]);
 
   const sidebarRef = useRef(null);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  useEffect(() => {
+
   const fetchProducts = async () => {
     try {
-      await dispatch(
+        dispatch(
         FetchProductByFilters({ productCollection, ...queryParams })
       ).unwrap();
     } catch (error) {
@@ -30,7 +34,6 @@ const CollectionPage = () => {
     }
   };
 
-  useEffect(() => {
     fetchProducts();
   }, [dispatch, productCollection, searchParams]);
 
@@ -120,7 +123,7 @@ const CollectionPage = () => {
             </p>
           </div>
         ) : (
-          <ProductGrid products={product} loading={loading} error={error} />
+          <ProductGrid product={product} loading={loading} error={error} />
         )}
       </div>
     </div>

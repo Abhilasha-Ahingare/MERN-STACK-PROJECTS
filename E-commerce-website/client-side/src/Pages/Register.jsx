@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registrationUser } from "../redux/slices/authSlice";
+import { register } from "../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
 
 const Register = () => {
@@ -13,7 +13,7 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(registrationUser({ name, email, password }));
+    dispatch(register({ name, email, password }));
     navigate("/login");
   };
 

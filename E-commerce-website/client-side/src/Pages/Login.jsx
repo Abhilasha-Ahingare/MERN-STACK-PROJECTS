@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import loginimg from "../assets/iamges/img1.jpg";
-import { loginUser } from "../redux/slices/authSlice";
+import { login } from "../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
 
 const Login = () => {
@@ -12,7 +12,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+    dispatch(login({ email, password }));
     navigate("/");
   };
   return (

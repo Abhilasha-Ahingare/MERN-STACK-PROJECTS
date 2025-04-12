@@ -265,8 +265,6 @@ const sortProducts = async (req, res) => {
     const products = await Product.find(query)
       .sort(sort)
       .limit(Number(limit || 12));
-
-    console.log("Found products:", products.length); // Debug log
     return res.status(200).json(products);
   } catch (error) {
     console.error("Error in sortProducts:", error);

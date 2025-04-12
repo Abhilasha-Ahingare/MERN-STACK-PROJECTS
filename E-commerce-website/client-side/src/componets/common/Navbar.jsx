@@ -8,10 +8,17 @@ import {
 import SearchBar from "./SearchBar";
 import CartDrawer from "../layouts/CartDrawer";
 import { IoMdClose } from "react-icons/io";
+import { useSelector } from "react-redux";
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
+  const { cart } = useSelector((state) => state.cart);
+
+  const cartItemCount =
+    cart?.products?.reduce((total, item) => {
+      return total + (item?.quantity || 0);
+    }, 0) || 0;
 
   const toggleNavDrawer = () => {
     setNavDrawerOpen(!navDrawerOpen);
@@ -45,19 +52,19 @@ const Navbar = () => {
             women's
           </Link>
           <Link
-            to="/collection/all?gender=kids"
+            to="/collection/all?gender=Top Wear"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             kids
           </Link>
           <Link
-            to="/collection/all?category=Bottom Wear"
+            to="/collection/all?category=Top Wear "
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             top wear
           </Link>
           <Link
-            to="/collection/all?category=Tom Wear"
+            to="/collection/all?category=Bottom Wear"
             className="text-gray-700 hover:text-black text-sm font-medium uppercase"
           >
             bottom wear
@@ -80,9 +87,11 @@ const Navbar = () => {
             className="relative hover:text-black"
           >
             <HiOutlineShoppingBag className="h-6 w-6 text-gray-700" />
-            <span className=" absolute  -top-3 bg-red-800 text-white rounded-full px-2 text-center ">
-              4
-            </span>
+            {cartItemCount > 0 && (
+              <span className=" absolute  -top-3 bg-red-800 text-white rounded-full px-2 text-center ">
+                {cartItemCount}
+              </span>
+            )}
           </button>
 
           {/* search */}
@@ -113,28 +122,28 @@ const Navbar = () => {
           <h2 className="text-xl font-semibold mb-4 uppercase">menu</h2>
           <nav className=" space-y-4">
             <Link
-              to="/collection/all"
+              to="/collection/all?gender=Men"
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black uppercase"
             >
               men's
             </Link>
             <Link
-              to="#"
+              to="/collection/all?gender=Women"
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black uppercase"
             >
               women's
             </Link>
             <Link
-              to="#"
+              to="/collection/all?category=Top Wear "
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black uppercase"
             >
               kids's
             </Link>
             <Link
-              to="#"
+              to="/collection/all?category=Top Wear "
               onClick={toggleNavDrawer}
               className="block text-gray-600 hover:text-black uppercase"
             >

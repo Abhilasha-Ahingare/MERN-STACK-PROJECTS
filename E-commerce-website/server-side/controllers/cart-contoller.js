@@ -4,9 +4,9 @@ const CartModel = require("../model/cart");
 //helper function to get a cart by user id and guset id
 const getCart = async (userId, guestId) => {
   if (userId) {
-    return await CartModel.findOne({ user: userId });
+    return await CartModel.findOne({ user: userId }).lean();
   } else if (guestId) {
-    return await CartModel.findOne({ guestId: guestId });
+    return await CartModel.findOne({ guestId: guestId }).lean();
   }
   return null;
 };
@@ -92,7 +92,6 @@ const cartItem = async (req, res) => {
 };
 
 //put carts
-
 const CartPut = async (req, res) => {
   const { productId, quantity, sizes, color, guestId, userId } = req.body;
 
@@ -101,7 +100,16 @@ const CartPut = async (req, res) => {
   }
 
   try {
+    // First check if product exists
+    const product = await ProductModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
     let PutCart = await getCart(userId, guestId);
+    if (!PutCart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
 
     const productIndex = PutCart.products.findIndex(
       (p) =>
@@ -124,11 +132,23 @@ const CartPut = async (req, res) => {
       await PutCart.save();
       return res.status(200).json(PutCart);
     } else {
-      return res.status(404).json({
-        message: "Product not found in cart",
-        searchCriteria: { productId, sizes, color },
-        cartProducts: PutCart.products,
+      // Add new product to cart if it exists in database but not in cart
+      PutCart.products.push({
+        productId,
+        name: product.name,
+        images: product.images[0].url,
+        price: Number(product.price),
+        sizes,
+        color,
+        quantity: Number(quantity),
       });
+
+      PutCart.totalPrice = PutCart.products.reduce(
+        (acc, item) => acc + Number(item.price) * Number(item.quantity),
+        0
+      );
+      await PutCart.save();
+      return res.status(200).json(PutCart);
     }
   } catch (error) {
     return res
@@ -141,7 +161,6 @@ const CartPut = async (req, res) => {
 
 const CartDelete = async (req, res) => {
   const { productId, quantity, sizes, color, guestId, userId } = req.body;
-
   try {
     let deleteCart = await getCart(userId, guestId);
     if (!deleteCart)
@@ -180,30 +199,26 @@ const GetCart = async (req, res) => {
   const guestId = req.body?.guestId || req.query?.guestId;
 
   if (!userId && !guestId) {
-    return res.status(400).json({ 
+    return res.status(400).json({
       message: "Either UserId or GuestId is required",
-      receivedParams: { userId, guestId, body: req.body, query: req.query }
     });
   }
 
   try {
     const cart = await getCart(userId, guestId);
     if (cart) {
-      return res.status(200).json({
-        success: true,
-        cart: cart
-      });
+      return res.status(200).json(cart); // Return cart directly instead of wrapping in object
     } else {
-      return res.status(404).json({ 
+      return res.status(404).json({
         message: "Cart not found",
-        params: { userId, guestId }
+        params: { userId, guestId },
       });
     }
   } catch (error) {
     return res.status(500).json({
       message: "Server error",
       error: error.message,
-      params: { userId, guestId }
+      params: { userId, guestId },
     });
   }
 };
@@ -212,7 +227,7 @@ const GetCart = async (req, res) => {
 
 const MergeCart = async (req, res) => {
   const guestId = req.body?.guestId || req.query.guestId;
-  const userId = req.user?.id; 
+  const userId = req.user?.id;
 
   if (!guestId) {
     return res.status(400).json({ message: "GuestId is required" });
@@ -271,6 +286,5 @@ const MergeCart = async (req, res) => {
     });
   }
 };
-
 
 module.exports = { cartItem, CartPut, CartDelete, GetCart, MergeCart };

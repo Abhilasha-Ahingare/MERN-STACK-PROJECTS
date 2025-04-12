@@ -113,8 +113,12 @@ const ProductsDetails = ({ productId }) => {
             {/* Main Image */}
             <div className="md:w-1/2">
               <img
-                src={mainImage}
-                alt="Product image"
+                src={
+                  mainImage ||
+                  selectedProduct?.images?.[0]?.url ||
+                  "/placeholder.jpg"
+                }
+                alt={selectedProduct?.name || "Product image"}
                 className="w-full h-auto object-cover rounded-lg mb-4"
               />
             </div>

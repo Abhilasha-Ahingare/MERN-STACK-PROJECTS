@@ -24,14 +24,14 @@ export const FetchProductByFilters = createAsyncThunk(
       const query = new URLSearchParams();
       if (productCollection)
         query.append("productCollection", productCollection);
-      if (sizes) query.append("sizes", sizes);
+      if (sizes?.length) query.append("sizes", sizes.join(","));
+      if (material?.length) query.append("material", material.join(","));
+      if (brand?.length) query.append("brand", brand.join(","));
       if (color) query.append("color", color);
       if (gender) query.append("gender", gender);
       if (minPrice) query.append("minPrice", minPrice);
       if (maxPrice) query.append("maxPrice", maxPrice);
-      if (material) query.append("material", material);
       if (sortBy) query.append("sortBy", sortBy);
-      if (brand) query.append("brand", brand);
       if (limit) query.append("limit", limit);
       if (search) query.append("search", search);
       if (category) query.append("category", category);
@@ -65,7 +65,7 @@ export const updateProduct = createAsyncThunk(
   async ({ id, productData }, { rejectWithValue }) => {
     try {
       const response = await api.put(`/api/product/${id}`, productData);
-      return response.data;
+      return response.data.updatedProduct;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Failed to update product" }
@@ -97,16 +97,16 @@ const productSlice = createSlice({
     loading: false,
     error: null,
     filters: {
-      category: "",
-      sizes: "",
-      color: "",
-      gender: "",
-      brand: "",
+      category: [],
+      sizes: [],
+      color: [],
+      gender: [],
+      brand: [],
       minPrice: "",
       maxPrice: "",
       search: "",
       sortBy: "",
-      material: "",
+      material: [],
       productCollection: "",
     },
   },
@@ -117,16 +117,16 @@ const productSlice = createSlice({
     },
     clearFilters: (state) => {
       state.filters = {
-        category: "",
-        sizes: "",
-        color: "",
-        gender: "",
-        brand: "",
+        category: [],
+        sizes: [],
+        color: [],
+        gender: [],
+        brand: [],
         minPrice: "",
         maxPrice: "",
         search: "",
         sortBy: "",
-        material: "",
+        material: [],
         productCollection: "",
       };
     },

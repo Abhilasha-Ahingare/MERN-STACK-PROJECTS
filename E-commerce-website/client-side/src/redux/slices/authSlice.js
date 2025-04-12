@@ -1,32 +1,44 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../utils/api";
+import { margeCart } from "./cartSlice";
 
-const userFromStorage = localStorage.getItem("userInfo")
-  ? JSON.parse(localStorage.getItem("userInfo"))
-  : null;
-
-const initialGuestId =
-  localStorage.getItem("guestId") || `guest_${new Date().getTime()}`;
-localStorage.setItem("guestId", initialGuestId);
-
-const initialState = {
-  user: userFromStorage,
-  guestId: initialGuestId,
-  loading: false,
-  error: null,
+const loadUserFromStorage = () => {
+  try {
+    const userData = localStorage.getItem("user");
+    return userData ? JSON.parse(userData) : null;
+  } catch (error) {
+    console.error("Error loading user from storage:", error);
+    return null;
+  }
 };
 
-export const loginUser = createAsyncThunk(
+const loadGuestId = () => {
+  let guestId = localStorage.getItem("guestId");
+  if (!guestId) {
+    guestId = `guest_${new Date().getTime()}`;
+    localStorage.setItem("guestId", guestId);
+  }
+  return guestId;
+};
+
+export const login = createAsyncThunk(
   "auth/login",
-  async (userData, { rejectWithValue }) => {
+  async ({ email, password }, { dispatch, getState, rejectWithValue }) => {
     try {
-      const response = await api.post("/api/auth/login", userData);
-      const { user, token } = response.data;
+      const response = await api.post("/api/auth/login", { email, password });
+      const guestId = getState().auth.guestId;
 
-      localStorage.setItem("userInfo", JSON.stringify(user));
-      localStorage.setItem("userToken", token);
+      // If we have a guestId and items in guest cart, merge them
+      if (guestId) {
+        try {
+          await dispatch(margeCart({ guestId }));
+          localStorage.removeItem("guestId"); // Clear guestId after successful merge
+        } catch (error) {
+          console.error("Error merging carts:", error);
+        }
+      }
 
-      return user;
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Login failed" }
@@ -35,89 +47,90 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const registrationUser = createAsyncThunk(
-  "auth/registration",
-  async (userData, { rejectWithValue }) => {
+export const register = createAsyncThunk(
+  "auth/register",
+  async (userData, { dispatch, getState, rejectWithValue }) => {
     try {
-      const response = await api.post("/api/auth/registration", userData);
-      const { user, token } = response.data;
+      const response = await api.post("/api/auth/register", userData);
+      const guestId = getState().auth.guestId;
 
-      if (!user || !token) {
-        throw new Error("Invalid response structure");
+      // If we have a guestId and items in guest cart, merge them
+      if (guestId) {
+        try {
+          await dispatch(margeCart({ guestId }));
+          localStorage.removeItem("guestId"); // Clear guestId after successful merge
+        } catch (error) {
+          console.error("Error merging carts:", error);
+        }
       }
 
-      localStorage.setItem("userInfo", JSON.stringify(user));
-      localStorage.setItem("userToken", token);
-
-      return user;
+      return response.data;
     } catch (error) {
-      let errorMessage = "Registration failed";
-
-      if (error.code === "ERR_NETWORK") {
-        errorMessage = "Network error: Unable to connect to the server";
-      } else if (error.response?.status === 404) {
-        errorMessage = "Server endpoint not found";
-      } else {
-        errorMessage = error.response?.data?.message || error.message;
-      }
-
-      return rejectWithValue({
-        message: errorMessage,
-        details: error.response?.data || {},
-        code: error.code || "UNKNOWN_ERROR",
-      });
+      return rejectWithValue(
+        error.response?.data || { message: "Registration failed" }
+      );
     }
   }
 );
 
+export const logout = createAsyncThunk("auth/logout", async () => {
+  localStorage.removeItem("user");
+  // Don't remove guestId on logout to maintain cart
+  return null;
+});
+
 const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState: {
+    user: loadUserFromStorage(),
+    guestId: loadGuestId(),
+    loading: false,
+    error: null,
+  },
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.guestId = `guest_${new Date().getTime()}`;
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("userToken");
-      localStorage.setItem("guestId", state.guestId);
-    },
-    generateNewGuestId: (state) => {
-      state.guestId = `guest_${new Date().getTime()}`;
-      localStorage.setItem("guestId", state.guestId);
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
+      .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.error = null;
+        localStorage.setItem("user", JSON.stringify(action.payload));
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        state.error = action.payload?.message || "Login failed";
       })
 
-      .addCase(registrationUser.pending, (state) => {
+      .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(registrationUser.fulfilled, (state, action) => {
+      .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.error = null;
+        localStorage.setItem("user", JSON.stringify(action.payload));
       })
-      .addCase(registrationUser.rejected, (state, action) => {
+      .addCase(register.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.message;
+        state.error = action.payload?.message || "Registration failed";
+      })
+
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        // Maintain guestId for cart persistence
+        if (!state.guestId) {
+          state.guestId = loadGuestId();
+        }
       });
   },
 });
 
-export const { logout, generateNewGuestId } = authSlice.actions;
-
+export const { clearError } = authSlice.actions;
 export default authSlice.reducer;
