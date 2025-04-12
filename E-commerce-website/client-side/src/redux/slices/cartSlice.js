@@ -111,7 +111,7 @@ export const margeCart = createAsyncThunk(
 );
 
 const initialState = {
-  cart: { products: [], totalPrice: 0 },
+  cart: loadCartFromStorage(),
   loading: false,
   error: null,
 };

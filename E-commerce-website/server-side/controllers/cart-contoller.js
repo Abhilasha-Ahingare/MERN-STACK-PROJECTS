@@ -4,9 +4,9 @@ const CartModel = require("../model/cart");
 //helper function to get a cart by user id and guset id
 const getCart = async (userId, guestId) => {
   if (userId) {
-    return await CartModel.findOne({ user: userId }).lean();
+    return await CartModel.findOne({ user: userId });
   } else if (guestId) {
-    return await CartModel.findOne({ guestId: guestId }).lean();
+    return await CartModel.findOne({ guestId: guestId });
   }
   return null;
 };
@@ -129,14 +129,15 @@ const CartPut = async (req, res) => {
         (acc, item) => acc + Number(item.price) * Number(item.quantity),
         0
       );
-      await PutCart.save();
-      return res.status(200).json(PutCart);
+
+      const savedCart = await PutCart.save();
+      return res.status(200).json(savedCart);
     } else {
       // Add new product to cart if it exists in database but not in cart
       PutCart.products.push({
         productId,
         name: product.name,
-        images: product.images[0].url,
+        images: product.images[0]?.url || "",
         price: Number(product.price),
         sizes,
         color,
@@ -147,13 +148,17 @@ const CartPut = async (req, res) => {
         (acc, item) => acc + Number(item.price) * Number(item.quantity),
         0
       );
-      await PutCart.save();
-      return res.status(200).json(PutCart);
+
+      const savedCart = await PutCart.save();
+      return res.status(200).json(savedCart);
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+    console.error("Cart update error:", error);
+    return res.status(500).json({
+      message: "Server error while updating cart",
+      error: error.message,
+      stack: error.stack,
+    });
   }
 };
 
@@ -207,7 +212,7 @@ const GetCart = async (req, res) => {
   try {
     const cart = await getCart(userId, guestId);
     if (cart) {
-      return res.status(200).json(cart); // Return cart directly instead of wrapping in object
+      return res.status(200).json(cart);
     } else {
       return res.status(404).json({
         message: "Cart not found",

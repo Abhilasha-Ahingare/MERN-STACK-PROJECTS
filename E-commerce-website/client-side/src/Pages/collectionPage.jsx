@@ -23,16 +23,13 @@ const CollectionPage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-
-  const fetchProducts = async () => {
-    try {
-        dispatch(
-        FetchProductByFilters({ productCollection, ...queryParams })
-      ).unwrap();
-    } catch (error) {
-      toast.error(error.message || "Failed to fetch products");
-    }
-  };
+    const fetchProducts = async () => {
+      try {
+        dispatch(FetchProductByFilters({ productCollection, ...queryParams }));
+      } catch (error) {
+        toast.error(error.message || "Failed to fetch products");
+      }
+    };
 
     fetchProducts();
   }, [dispatch, productCollection, searchParams]);

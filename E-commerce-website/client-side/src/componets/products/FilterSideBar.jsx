@@ -167,7 +167,7 @@ const FilterSideBar = () => {
           size
         </label>
         {size.map((size) => (
-          <div className="flex items-center mb-1">
+           <div className="flex items-center mb-1">
             <input
               type="checkbox"
               name="sizes"

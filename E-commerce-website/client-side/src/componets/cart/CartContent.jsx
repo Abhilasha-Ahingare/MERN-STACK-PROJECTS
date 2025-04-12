@@ -10,16 +10,7 @@ const CartContent = ({ product, userId, guestId }) => {
   const dispatch = useDispatch();
   const products = product?.products || [];
 
-  console.log("CartContent Products:", products);
-
   const handleAddToCart = (productId, delta, quantity, sizes, color) => {
-    console.log("Updating quantity:", {
-      productId,
-      delta,
-      quantity,
-      sizes,
-      color,
-    });
     const newQuantity = quantity + delta;
     if (newQuantity >= 1) {
       dispatch(
