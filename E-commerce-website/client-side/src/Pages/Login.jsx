@@ -1,20 +1,57 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import loginimg from "../assets/iamges/img1.jpg";
 import { login } from "../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
+import { margeCart } from "../redux/slices/cartSlice";
+import { useSelector } from "react-redux";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { user, guestId } = useSelector((state) => state.auth);
+  const { cart } = useSelector((state) => state.cart);
+
+  //get redirect parameter and check if it's checkout or something
+  const redirect = new URLSearchParams(location.search).get("redirect") || "/";
+  const isCheckoutRedirect = redirect.includes("checkout");
+
+  useEffect(() => {
+    if (user) {
+      if (cart?.products?.length > 0 && guestId) {
+        dispatch(margeCart({ guestId, user })).then(() => {
+          navigate(isCheckoutRedirect ? "/checkout" : "/");
+        });
+      } else {
+        navigate(isCheckoutRedirect ? "/checkout" : "/");
+      }
+    }
+  }, [user, guestId, cart, navigate, isCheckoutRedirect, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }));
-    navigate("/");
+    dispatch(login({ email, password }))
+      .unwrap()
+      .then((result) => {
+        console.log("Login successful:", result);
+        if (cart?.products?.length > 0 && guestId) {
+          dispatch(margeCart({ guestId, user: result })).then(() => {
+            navigate(isCheckoutRedirect ? "/checkout" : "/");
+          });
+        } else {
+          navigate(isCheckoutRedirect ? "/checkout" : "/");
+        }
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+        alert(error.message || "Login failed. Please try again.");
+      });
   };
+
   return (
     <div className="flex h-screen w-full">
       <div className="w-full md:w-1/2 flex justify-center items-center bg-gray-50">
@@ -78,7 +115,10 @@ const Login = () => {
             <p className="mt-6 text-center text-sm uppercase">
               {" "}
               don't have an account ?
-              <Link to="/registration" className="text-blue-500 uppercase">
+              <Link
+                to={`/registration?redirect=${encodeURIComponent(redirect)}`}
+                className="text-blue-500 uppercase"
+              >
                 register
               </Link>
             </p>

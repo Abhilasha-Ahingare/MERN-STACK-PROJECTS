@@ -204,9 +204,7 @@ const GetCart = async (req, res) => {
   const guestId = req.body?.guestId || req.query?.guestId;
 
   if (!userId && !guestId) {
-    return res.status(400).json({
-      message: "Either UserId or GuestId is required",
-    });
+    return res.status(200).json({ products: [], totalPrice: 0 }); 
   }
 
   try {
@@ -214,16 +212,21 @@ const GetCart = async (req, res) => {
     if (cart) {
       return res.status(200).json(cart);
     } else {
-      return res.status(404).json({
-        message: "Cart not found",
-        params: { userId, guestId },
-      });
+      // Create a new empty cart
+      const newCart = {
+        user: userId || undefined,
+        guestId: guestId,
+        products: [],
+        totalPrice: 0,
+      };
+      const createdCart = await CartModel.create(newCart);
+      return res.status(200).json(createdCart);
     }
   } catch (error) {
+    console.error("GetCart error:", error);
     return res.status(500).json({
       message: "Server error",
       error: error.message,
-      params: { userId, guestId },
     });
   }
 };

@@ -13,8 +13,16 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(register({ name, email, password }));
-    navigate("/login");
+    dispatch(register({ name, email, password }))
+      .unwrap()
+      .then((result) => {
+        console.log("Registration successful:", result);
+        navigate("/login");
+      })
+      .catch((error) => {
+        console.error("Registration failed:", error);
+        alert(error.message || "Registration failed. Please try again.");
+      });
   };
 
   return (

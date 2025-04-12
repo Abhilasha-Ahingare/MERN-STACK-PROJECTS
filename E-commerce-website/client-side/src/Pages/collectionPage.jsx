@@ -6,7 +6,10 @@ import SortOpention from "../componets/products/SortOpention";
 import ProductGrid from "../componets/products/ProductGrid";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { FetchProductByFilters } from "../redux/slices/product-Slice";
+import {
+  FetchProductByFilters,
+  FetchProductByDetails,
+} from "../redux/slices/product-Slice";
 import { toast } from "react-toastify";
 
 const CollectionPage = () => {
@@ -22,21 +25,13 @@ const CollectionPage = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        dispatch(FetchProductByFilters({ productCollection, ...queryParams }));
-      } catch (error) {
-        toast.error(error.message || "Failed to fetch products");
-      }
-    };
 
-    fetchProducts();
+  useEffect(() => {
+    dispatch(FetchProductByFilters({ productCollection, ...queryParams }));
   }, [dispatch, productCollection, searchParams]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchProducts();
     setIsRefreshing(false);
   };
 
