@@ -13,7 +13,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, guestId } = useSelector((state) => state.auth);
+  const { user, guestId } = useSelector((state) => state.auth.user);
   const { cart } = useSelector((state) => state.cart);
 
   //get redirect parameter and check if it's checkout or something

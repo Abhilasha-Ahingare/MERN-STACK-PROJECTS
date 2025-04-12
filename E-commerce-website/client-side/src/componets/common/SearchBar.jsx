@@ -23,7 +23,6 @@ const SearchBar = () => {
     const searchQuery = searchTerm.toLowerCase().trim();
     dispatch(setFilters({ search: searchQuery }));
     dispatch(FetchProductByFilters({ search: searchQuery }))
-      .unwrap()
       .then(() => {
         navigate(`/collection/all?search=${encodeURIComponent(searchQuery)}`);
         setIsOpen(false);
