@@ -100,7 +100,9 @@ export const margeCart = createAsyncThunk(
   "cart/margeCart",
   async ({ guestId }, { rejectWithValue }) => {
     try {
-      const response = await api.post("/api/cart/merge-cart", { guestId });
+      const response = await api.post("/api/cart/merge-cart", {
+        guestId,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(

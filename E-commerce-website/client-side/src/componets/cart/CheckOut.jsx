@@ -1,30 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PayPalButton from "./PayPalButton";
-const Cart = {
-  products: [
-    {
-      name: "stylish jacket",
-      size: "M",
-      color: "black",
-      price: 120,
-      image: "https://picsum.photos/500/500?random=1",
-    },
-    {
-      name: "stylish jacket",
-      size: "M",
-      color: "black",
-      price: 120,
-      image: "https://picsum.photos/500/500?random=2",
-    },
-  ],
-  totalPrice: 194,
-};
+import { useDispatch, useSelector } from "react-redux";
+import { createCheckout } from "../../redux/slices/checkoutSlice";
+import api from "../../utils/api";
 
 const CheckOut = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const { cart, loading, error } = useSelector((state) => state.cart);
+
   const [checkoutId, setCheckoutId] = useState(null);
-  const [shippingAddress, setShippingAdress] = useState({
+  const [shippingAddress, setShippingAddress] = useState({
     firstName: "",
     lastName: "",
     address: "",
@@ -34,168 +22,136 @@ const CheckOut = () => {
     phone: "",
   });
 
-  const handleCreateCheckout = (e) => {
+  useEffect(() => {
+    if (!loading && (!cart || !cart.products || cart.products.length === 0)) {
+      navigate("/");
+    }
+  }, [cart, loading, navigate]);
+
+  const handleCreateCheckout = async (e) => {
     e.preventDefault();
-    setCheckoutId(123);
+    try {
+      const res = await dispatch(
+        createCheckout({
+          items: cart.products,
+          shippingAddress,
+          paymentMethod: "Paypal",
+          totalPrice: cart.totalPrice,
+        })
+      );
+
+      if (res.payload && res.payload._id) {
+        setCheckoutId(res.payload._id);
+      } else {
+        console.error("Checkout creation failed", res);
+        alert("Checkout creation failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Something went wrong during checkout.");
+    }
   };
 
-  const handlePaymentSuccess = (details) => {
-    alert("payment succesfully");
-    navigate("/order-comformation");
+  const handlePaymentSuccess = async (details) => {
+    try {
+      const response = await api.put(
+        `/api/checkout/${checkoutId}/pay`,
+        { paymentStatus: "paid", paymentDetails: details },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        await finalizeOrder();
+      } else {
+        alert("Payment update failed.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Payment processing failed.");
+    }
   };
+
+  const finalizeOrder = async () => {
+    try {
+      await api.put(
+        `/api/checkout/${checkoutId}/finalize`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("userToken")}`,
+          },
+        }
+      );
+      navigate("/order-conformation");
+    } catch (error) {
+      console.error("Finalize error:", error);
+      alert("Finalizing order failed.");
+    }
+  };
+
+  if (loading) return <p>Loading cart...</p>;
+  if (error) return <p>Error: {error}</p>;
+  if (!cart || !cart.products?.length) return <p>Your cart is empty</p>;
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* left section */}
+          {/* Left Side */}
           <div className="lg:col-span-8">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold uppercase mb-6">
-                checkout
-              </h2>
+              <h2 className="text-2xl font-semibold uppercase mb-6">Checkout</h2>
               <form onSubmit={handleCreateCheckout}>
-                <h3 className="text-lg mb-4">contact details</h3>
+                <h3 className="text-lg mb-4">Contact Details</h3>
                 <div className="mb-4">
-                  <label className="block text-gray-700 uppercase">email</label>
+                  <label className="block text-gray-700 uppercase">Email</label>
                   <input
                     type="email"
-                    value="sb-vkyiu39709849@business.example.com"
-                    placeholder="enter your email"
+                    value={user?.user?.email || ""}
                     className="w-full p-2 border rounded"
                     disabled
                   />
                 </div>
+
                 <h3 className="text-lg mb-4 uppercase">Delivery</h3>
                 <div className="mb-4 grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-700 uppercase">
-                      fisrt Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      className=" w-full p-2 border rounded"
-                      value={shippingAddress.firstName}
-                      onChange={(e) =>
-                        setShippingAdress({
-                          ...shippingAddress,
-                          firstName: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-gray-700 uppercase">
-                      last Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      className=" w-full p-2 border rounded"
-                      value={shippingAddress.lastName}
-                      onChange={(e) =>
-                        setShippingAdress({
-                          ...shippingAddress,
-                          lastName: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 uppercase">
-                      address
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingAddress.address}
-                      onChange={(e) =>
-                        setShippingAdress({
-                          ...shippingAddress,
-                          address: e.target.value,
-                        })
-                      }
-                      required
-                      className=" w-full p-2 border rounded"
-                    />
-                  </div>
-
-                  <div className="mb-4 grid grid-cols-2 gap-4">
-                    <div>
+                  {[
+                    { label: "First Name", name: "firstName" },
+                    { label: "Last Name", name: "lastName" },
+                    { label: "Address", name: "address", full: true },
+                    { label: "City", name: "city" },
+                    { label: "Postal Code", name: "postalCode" },
+                    { label: "County", name: "county" },
+                    { label: "Phone", name: "phone" },
+                  ].map((field) => (
+                    <div
+                      key={field.name}
+                      className={field.full ? "col-span-2" : ""}
+                    >
                       <label className="block text-gray-700 uppercase">
-                        City
+                        {field.label}
                       </label>
                       <input
-                        type="text"
+                        type={field.name === "phone" ? "number" : "text"}
+                        value={shippingAddress[field.name]}
                         required
-                        className=" w-full p-2 border rounded"
-                        value={shippingAddress.city}
                         onChange={(e) =>
-                          setShippingAdress({
-                            ...shippingAddress,
-                            city: e.target.value,
-                          })
+                          setShippingAddress((prev) => ({
+                            ...prev,
+                            [field.name]: e.target.value,
+                          }))
                         }
+                        className="w-full p-2 border rounded"
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-gray-700 uppercase">
-                        postal code
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        className=" w-full p-2 border rounded"
-                        value={shippingAddress.postalCode}
-                        onChange={(e) =>
-                          setShippingAdress({
-                            ...shippingAddress,
-                            postalCode: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-gray-700 uppercase">
-                        county
-                      </label>
-                      <input
-                        type="text"
-                        value={shippingAddress.county}
-                        onChange={(e) =>
-                          setShippingAdress({
-                            ...shippingAddress,
-                            county: e.target.value,
-                          })
-                        }
-                        required
-                        className=" w-full p-2 border rounded"
-                      />
-                    </div>
-
-                    <div className="mb-4">
-                      <label className="block text-gray-700 uppercase">
-                        phone
-                      </label>
-                      <input
-                        type="number"
-                        value={shippingAddress.phone}
-                        onChange={(e) =>
-                          setShippingAdress({
-                            ...shippingAddress,
-                            phone: e.target.value,
-                          })
-                        }
-                        required
-                        className=" w-full p-2 border rounded"
-                      />
-                    </div>
-                  </div>
+                  ))}
                 </div>
-                <div className="mt-6 ">
+
+                <div className="mt-6">
                   {!checkoutId ? (
                     <button
                       type="submit"
@@ -205,15 +161,11 @@ const CheckOut = () => {
                     </button>
                   ) : (
                     <div>
-                      <h3 className="text-lg mb-4 uppercase">
-                        {" "}
-                        pay with paypal
-                      </h3>
-                      {/* paypal components */}
+                      <h3 className="text-lg mb-4 uppercase">Pay with PayPal</h3>
                       <PayPalButton
-                        amount={100}
+                        amount={cart.totalPrice}
                         onSuccess={handlePaymentSuccess}
-                        onError={(err) => alert("payment failed try again")}
+                        onError={() => alert("Payment failed, try again")}
                       />
                     </div>
                   )}
@@ -222,33 +174,33 @@ const CheckOut = () => {
             </div>
           </div>
 
-          {/* right section */}
+          {/* Right Side */}
           <div className="lg:col-span-4">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-              <h3 className="text-lg font-semibold mb-4 uppercase">
-                order summary
-              </h3>
+              <h3 className="text-lg font-semibold mb-4 uppercase">Order Summary</h3>
               <div className="space-y-4">
-                {Cart.products.map((product, index) => (
+                {cart.products.map((product, index) => (
                   <div className="flex space-x-4 border-b pb-4" key={index}>
                     <img
-                      src={product.image}
+                      src={product.images}
                       alt={product.name}
                       className="w-24 h-24 object-cover rounded"
                     />
                     <div className="flex-1">
                       <h3 className="font-medium">{product.name}</h3>
-                      <p className="text-gray-500">Size: {product.size}</p>
+                      <p className="text-gray-500">Size: {product.sizes}</p>
                       <p className="text-gray-500">Color: {product.color}</p>
                     </div>
-                    <p className="font-semibold">$ {product.price?.toLocaleString()}</p>
+                    <p className="font-semibold">
+                      ₹ {product.price?.toLocaleString()}
+                    </p>
                   </div>
                 ))}
               </div>
               <div className="mt-4 pt-4 border-t">
                 <div className="flex justify-between">
                   <span>Total:</span>
-                  <span className="font-semibold">$ {Cart.totalPrice}</span>
+                  <span className="font-semibold">₹ {cart.totalPrice}</span>
                 </div>
               </div>
             </div>

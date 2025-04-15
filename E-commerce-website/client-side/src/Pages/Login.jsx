@@ -13,8 +13,8 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, guestId } = useSelector((state) => state.auth);
   const { cart } = useSelector((state) => state.cart);
+  const { user, guestId } = useSelector((state) => state.auth);
 
   //get redirect parameter and check if it's checkout or something
   const redirect = new URLSearchParams(location.search).get("redirect") || "/";
@@ -23,7 +23,7 @@ const Login = () => {
   useEffect(() => {
     if (user) {
       if (cart?.products?.length > 0 && guestId) {
-        dispatch(margeCart({ guestId, user })).then(() => {
+        dispatch(margeCart({ guestId })).then(() => {
           navigate(isCheckoutRedirect ? "/checkout" : "/");
         });
       } else {
@@ -32,21 +32,22 @@ const Login = () => {
     }
   }, [user, guestId, cart, navigate, isCheckoutRedirect, dispatch]);
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
     dispatch(login({ email, password })).then((result) => {
 
-        if (cart?.products?.length > 0 && guestId) {
-          dispatch(margeCart({ guestId, user: result })).then(() => {
-            navigate(isCheckoutRedirect ? "/checkout" : "/");
-          });
-        } else {
+      const loggedInUser = result?.payload;
+
+      if (cart?.products?.length > 0 && guestId && loggedInUser) {
+        dispatch(margeCart({ guestId, user: loggedInUser })).then(() => {
           navigate(isCheckoutRedirect ? "/checkout" : "/");
-        }
-      })
-      .catch((error) => {
-        alert(error.message || "Login failed. Please try again.");
-      });
+        });
+      } else {
+        navigate(isCheckoutRedirect ? "/checkout" : "/");
+      }
+    });
   };
 
   return (

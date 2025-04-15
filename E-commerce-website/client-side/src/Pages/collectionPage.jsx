@@ -8,7 +8,6 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FetchProductByFilters,
-  FetchProductByDetails,
 } from "../redux/slices/product-Slice";
 import { toast } from "react-toastify";
 

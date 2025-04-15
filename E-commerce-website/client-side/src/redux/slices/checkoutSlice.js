@@ -18,7 +18,7 @@ export const createCheckout = createAsyncThunk(
 const checkoutSlice = createSlice({
   name: "checkout",
   initialState: {
-    checkout: null,
+    checkout: [],
     loading: false,
     error: null,
   },

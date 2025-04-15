@@ -237,6 +237,7 @@ const MergeCart = async (req, res) => {
   const guestId = req.body?.guestId || req.query.guestId;
   const userId = req.user?.id;
 
+  
   if (!guestId) {
     return res.status(400).json({ message: "GuestId is required" });
   }
@@ -279,7 +280,7 @@ const MergeCart = async (req, res) => {
 
       await CartModel.findOneAndDelete({ guestId });
 
-      // return res.status(200).json({ ...userCart.toObject(), userId });
+      return res.status(200).json({ ...userCart.toObject(), userId });
     } else {
       guestCart.user = userId;
       guestCart.guestId = undefined;

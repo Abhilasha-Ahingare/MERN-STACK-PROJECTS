@@ -75,7 +75,7 @@ const orderSchema = new Schema(
       default: "PENDING",
     },
   },
-  { timeseries: true }
+  { timestamps: true }
 );
 
 module.exports = model("Order", orderSchema);

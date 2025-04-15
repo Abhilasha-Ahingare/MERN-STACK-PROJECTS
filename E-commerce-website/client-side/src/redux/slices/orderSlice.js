@@ -1,12 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 
+// Fetch orders of the current user
 export const fetchMyOrders = createAsyncThunk(
   "order/fetchMyOrders",
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/api/order/myorder");
-      return response.data;
+      // Ensure the API returns the correct structure.
+      return response.data || []; // If response is an object, ensure you extract data as expected.
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Failed to fetch orders" }
@@ -15,12 +17,14 @@ export const fetchMyOrders = createAsyncThunk(
   }
 );
 
+// Fetch single order by ID
 export const fetchOrderById = createAsyncThunk(
   "order/fetchOrderById",
   async (orderId, { rejectWithValue }) => {
     try {
       const response = await api.get(`/api/order/${orderId}`);
-      return response.data;
+      // Assuming the response contains the full order object, adjust if needed.
+      return response.data || {}; // Ensure the API returns the order object as expected.
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Failed to fetch order details" }
@@ -32,10 +36,10 @@ export const fetchOrderById = createAsyncThunk(
 const orderSlice = createSlice({
   name: "order",
   initialState: {
-    orders: [],
-    selectedOrder: null,
-    loading: false,
-    error: null,
+    orders: [],           // List of orders
+    selectedOrder: null,   // Selected order details
+    loading: false,        // Loading state
+    error: null,           // Error state
   },
   reducers: {
     clearError: (state) => {
@@ -54,11 +58,11 @@ const orderSlice = createSlice({
       })
       .addCase(fetchMyOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload;
+        state.orders = action.payload; // Save the fetched orders in state
       })
       .addCase(fetchMyOrders.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload?.message || "Failed to fetch orders";
+        state.error = action.payload?.message || "Failed to fetch orders"; // Error handling
       })
 
       // Fetch order by ID
@@ -68,12 +72,12 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrderById.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedOrder = action.payload;
+        state.selectedOrder = action.payload; // Save the selected order details
       })
       .addCase(fetchOrderById.rejected, (state, action) => {
         state.loading = false;
         state.error =
-          action.payload?.message || "Failed to fetch order details";
+          action.payload?.message || "Failed to fetch order details"; // Error handling
       });
   },
 });

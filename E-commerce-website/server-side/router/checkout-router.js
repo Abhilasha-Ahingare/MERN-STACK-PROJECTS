@@ -5,7 +5,7 @@ const { CheckoutItem, checkoutPay, checkoutFinalize } = require("../controllers/
 
 router.post("/", protect, CheckoutItem);
 router.put("/:id/pay", protect, checkoutPay);
-router.post("/:id/finalized", protect, checkoutFinalize);
+router.post("/:id/finalize", protect, checkoutFinalize);
 
 
 

@@ -1,70 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMyOrders } from "../redux/slices/orderSlice";
 
 const MyOrderPage = () => {
-  const [orders, setOrder] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { orders, loading, error } = useSelector((state) => state.orders || {});
+  console.log(orders);
 
   useEffect(() => {
-    setTimeout(() => {
-      const mockOrder = [
-        {
-          _id: "12345",
-          createAt: new Date(),
-          shippingAdress: { city: "new york", county: "usa" },
-          ordersItem: [
-            {
-              name: "product 1",
-              image: "https://picsum.photos/500/500?random=1",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          _id: "12",
-          createAt: new Date(),
-          shippingAdress: { city: "new york", county: "usa" },
-          ordersItem: [
-            {
-              name: "product 1",
-              image: "https://picsum.photos/500/500?random=2",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          _id: "145",
-          createAt: new Date(),
-          shippingAdress: { city: "new york", county: "usa" },
-          ordersItem: [
-            {
-              name: "product 1",
-              image: "https://picsum.photos/500/500?random=3",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-        {
-          _id: "1234545",
-          createAt: new Date(),
-          shippingAdress: { city: "new york", county: "usa" },
-          ordersItem: [
-            {
-              name: "product 1",
-              image: "https://picsum.photos/500/500?random=4",
-            },
-          ],
-          totalPrice: 100,
-          isPaid: true,
-        },
-      ];
-
-      setOrder(mockOrder);
-    }, 1000);
-  }, []);
+    dispatch(fetchMyOrders());
+  }, [dispatch]);
 
   const handleRowClick = (orderId) => {
     navigate(`/order/${orderId}`);
@@ -77,13 +24,13 @@ const MyOrderPage = () => {
         <table className="min-w-full text-left text-gray-500">
           <thead className="bg-gray-100 text-sm uppercase text-gray-700 ">
             <tr>
-              <th className="py-2 px-4 sm:py-3">image</th>
-              <th className="py-2 px-4 sm:py-3">order id</th>
-              <th className="py-2 px-4 sm:py-3">createAt</th>
-              <th className="py-2 px-4 sm:py-3">shpingAdress</th>
-              <th className="py-2 px-4 sm:py-3">items</th>
-              <th className="py-2 px-4 sm:py-3">price</th>
-              <th className="py-2 px-4 sm:py-3">status</th>
+              <th className="py-2 px-4 sm:py-3">Image</th>
+              <th className="py-2 px-4 sm:py-3">Order ID</th>
+              <th className="py-2 px-4 sm:py-3">Created At</th>
+              <th className="py-2 px-4 sm:py-3">Shipping Address</th>
+              <th className="py-2 px-4 sm:py-3">Items</th>
+              <th className="py-2 px-4 sm:py-3">Price</th>
+              <th className="py-2 px-4 sm:py-3">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -95,26 +42,29 @@ const MyOrderPage = () => {
                   className="border-b hover:border-gray-50 cursor-pointer"
                 >
                   <td className="py-2 px-2 sm:py-4 sm:px-4">
-                    <img
-                      src={order.ordersItem[0].image}
-                      alt={order.ordersItem[0].name}
-                      className=" w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg"
-                    />
+                    {/* Assuming you want the first item's image */}
+                    {order.orderItemSchema.length > 0 && (
+                      <img
+                        src={order.orderItemSchema[0].image} // Update with the right field
+                        alt={order.orderItemSchema[0].name} // Update with the right field
+                        className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg"
+                      />
+                    )}
                   </td>
-                  <td className=" px-2 py-2 sm:py-4 sm:px-4 text-gray-900 font-medium whitespace-nowrap">
+                  <td className="px-2 py-2 sm:py-4 sm:px-4 text-gray-900 font-medium whitespace-nowrap">
                     #{order._id}
                   </td>
                   <td className="py-2 px-2 sm:py-4 sm:px-4 ">
-                    {new Date(order.createAt).toLocaleDateString()}{" "}
-                    {new Date(order.createAt).toLocaleTimeString()}
+                    {new Date(order.createdAt).toLocaleDateString()}{" "}
+                    {new Date(order.createdAt).toLocaleTimeString()}
                   </td>
                   <td className="py-2 px-2 sm:py-4 sm:px-4 ">
-                    {order.shippingAdress
-                      ? `${order.shippingAdress.city},${order.shippingAdress.county}`
+                    {order.shippingAddress
+                      ? `${order.shippingAddress.city}, ${order.shippingAddress.county}`
                       : "N/A"}
                   </td>
                   <td className="py-2 px-2 sm:py-4 sm:px-4 ">
-                    {order.ordersItem.length}
+                    {order.orderItemSchema.length} {/* Show number of items */}
                   </td>
                   <td className="py-2 px-2 sm:py-4 sm:px-4 ">
                     {order.totalPrice}
@@ -127,7 +77,7 @@ const MyOrderPage = () => {
                           : "bg-red-100 text-red-700"
                       } px-2 py-1 rounded-full text-xs sm:text-sm font-medium `}
                     >
-                      {order.isPaid ? "paid" : "pending"}
+                      {order.isPaid ? "Paid" : "Pending"}
                     </span>
                   </td>
                 </tr>
@@ -138,7 +88,7 @@ const MyOrderPage = () => {
                   colSpan={7}
                   className="py-4 px-4 text-center text-gray-500 uppercase"
                 >
-                  you have no orders
+                  You have no orders
                 </td>
               </tr>
             )}

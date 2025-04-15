@@ -23,6 +23,8 @@ const CheckoutItemSchema = new Schema(
       type: Number,
       required: true,
     },
+    sizes: String,
+    color: String,
   },
   { _id: false }
 );

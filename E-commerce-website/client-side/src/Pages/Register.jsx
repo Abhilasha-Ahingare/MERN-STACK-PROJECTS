@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { register } from "../redux/slices/authSlice";
-import { margeCart } from "../redux/slices/cartSlice"; // Add this import
+import { margeCart } from "../redux/slices/cartSlice";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 
@@ -30,7 +30,7 @@ const Register = () => {
         navigate(isCheckoutRedirect ? "/checkout" : "/");
       }
     }
-  }, [user, guestId, cart, navigate, isCheckoutRedirect, dispatch]);
+  }, [user, guestId, cart, navigate, redirect, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ const Register = () => {
       .unwrap()
       .then((result) => {
         if (result.success) {
-          navigate("/login");
+          navigate(`/login?redirect=${encodeURIComponent(redirect)}`);
         }
       })
       .catch((error) => {
