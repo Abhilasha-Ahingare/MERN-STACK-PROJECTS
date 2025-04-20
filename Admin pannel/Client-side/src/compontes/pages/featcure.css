@@ -1,0 +1,48 @@
+.feature-section {
+    padding: 4rem 1rem;
+    background-color: white;
+  }
+  
+  .feature-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  @media (min-width: 768px) {
+    .feature-container {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .feature-icon {
+    padding: 1rem;
+    border-radius: 9999px;
+    margin-bottom: 1rem;
+  }
+  
+  .icon {
+    font-size: 1.25rem; /* text-xl */
+  }
+  
+  .feature-title {
+    text-transform: uppercase;
+    letter-spacing: -0.015em; 
+    margin-bottom: 0.5rem;
+  }
+  
+  .feature-description {
+    color: #4B5563; 
+    font-size: 0.875rem; 
+    letter-spacing: -0.015em; 
+  }
+  

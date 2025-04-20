@@ -1,0 +1,35 @@
+header {
+  padding: 1rem 5%;
+  background: #111f24;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-brand a {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #b4b2b2;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+nav ul {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+nav ul li a {
+  color: #c2bfbf;
+  text-decoration: none;
+  font-size: 1rem;
+  text-transform: capitalize;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+nav ul li a:hover {
+  color: #717172;
+}

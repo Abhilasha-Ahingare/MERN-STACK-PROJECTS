@@ -1,0 +1,68 @@
+/* serviceAdmin.css */
+
+.admin-users-container {
+    padding: 3rem 2rem;
+    background-color: #f8f9fa;
+    min-height: 50vh;
+    font-family: "Segoe UI", sans-serif;
+  }
+  
+  .admin-users-title {
+    font-size: 2.5rem;
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 3rem;
+    position: relative;
+    text-transform: capitalize;
+  }
+  
+  .admin-users-title::after {
+    content: "";
+    display: block;
+    width: 70px;
+    height: 4px;
+    margin: 10px auto 0;
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    border-radius: 2px;
+  }
+  
+  .user-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+  }
+  
+  .user-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    width: 250px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .user-card p {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+  }
+  
+  .user-card .label {
+    font-weight: 600;
+    color: #34495e;
+  }
+  
