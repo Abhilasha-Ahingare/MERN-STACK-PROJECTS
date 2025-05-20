@@ -5,11 +5,23 @@ export const createCheckout = createAsyncThunk(
   "checkout/createCheckout",
   async (checkoutData, { rejectWithValue }) => {
     try {
-      const response = await api.post("/api/checkout", checkoutData);
+      const token = localStorage.getItem("userToken");
+      if (!token) {
+        return rejectWithValue({ message: "Please login to checkout" });
+      }
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const response = await api.post("/api/checkout", checkoutData, config);
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data || { message: "Failed to process checkout" }
+        error.response?.data || { message: "Checkout failed" }
       );
     }
   }
