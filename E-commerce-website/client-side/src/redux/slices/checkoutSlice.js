@@ -17,7 +17,7 @@ export const createCheckout = createAsyncThunk(
         },
       };
 
-      const response = await api.post("/api/checkout", checkoutData, config);
+      const response = await api.post(`/api/checkout`, checkoutData, config);
       return response.data;
     } catch (error) {
       return rejectWithValue(
