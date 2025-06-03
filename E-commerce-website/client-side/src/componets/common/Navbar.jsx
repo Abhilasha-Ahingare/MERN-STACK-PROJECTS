@@ -98,7 +98,7 @@ const Navbar = () => {
           <div className=" overflow-hidden">
             <SearchBar />
           </div>
-          <button onClick={toggleNavDrawer} className="md:hover:">
+          <button onClick={toggleNavDrawer} className="block md:hidden">
             <HiBars3BottomRight className="h-6 w-6 text-gray-700" />
           </button>
         </div>
@@ -111,10 +111,10 @@ const Navbar = () => {
           navDrawerOpen ? "translate-x-0" : "translate-x-full"
         } `}
       >
-        <div className=" flex justify-end p-4">
+        <div className=" flex justify-end p-4 ">
           <button onClick={toggleNavDrawer}>
             {" "}
-            <IoMdClose className="h-6 w-6 text-gray-600" />{" "}
+            <IoMdClose className="h-6 w-6 text-gray-600 " />{" "}
           </button>
         </div>
         {/* nav */}

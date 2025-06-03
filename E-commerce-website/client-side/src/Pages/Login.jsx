@@ -123,7 +123,7 @@ const Login = () => {
           </div>
         </form>
       </div>
-      <div className="hidden md:block md:w-1/2">
+      {/* <div className="hidden md:block md:w-1/2">
         <div className="h-full">
           <img
             src={loginimg}
@@ -131,7 +131,7 @@ const Login = () => {
             className="w-full h-full object-cover"
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
