@@ -6,13 +6,9 @@ import { fetchMyOrders } from "../redux/slices/orderSlice";
 const MyOrderPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  // Fix 1: Add proper default values and memoized selector
-  const { orders = [], loading = false, error = null } = useSelector((state) => ({
-    orders: state.orders?.orders || [],
-    loading: state.orders?.loading || false,
-    error: state.orders?.error || null
-  }));
+
+  const { orders, loading, error } = useSelector((state) => state.orders);
+  console.log(orders.order);
 
   useEffect(() => {
     dispatch(fetchMyOrders());
@@ -23,7 +19,10 @@ const MyOrderPage = () => {
   };
 
   if (loading) return <div className="max-w-7xl mx-auto p-4">Loading...</div>;
-  if (error) return <div className="max-w-7xl mx-auto p-4 text-red-500">Error: {error}</div>;
+  if (error)
+    return (
+      <div className="max-w-7xl mx-auto p-4 text-red-500">Error: {error}</div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6">

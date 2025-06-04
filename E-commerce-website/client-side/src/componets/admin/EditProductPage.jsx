@@ -1,36 +1,79 @@
-import React, { useState } from "react";
-
-const defaultData = [
-  {
-    name: "",
-    description: "",
-    price: 0,
-    countInStock: 0,
-    sku: "",
-    category: "",
-    brand: "",
-    sizes: [],
-    colors: "", // Change this to empty string instead of array
-    collection: "",
-    material: "",
-    gender: "",
-    image: [
-      { url: "https://picsum.photos/500/500?random=1" },
-      { url: "https://picsum.photos/500/500?random=2" },
-    ],
-  },
-];
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  FetchProductByDetails,
+  updateProduct,
+} from "../../redux/slices/product-Slice";
+import axios from "axios";
 
 const EditProductPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { seletedProduct, loading, error } = useSelector(
+    (state) => state.products
+  );
+
+  const defaultData = [
+    {
+      name: "",
+      description: "",
+      price: 0,
+      countInStock: 0,
+      sku: "",
+      category: "",
+      brand: "",
+      sizes: [],
+      color: [],
+      collection: "",
+      material: "",
+      gender: "",
+      image: [],
+    },
+  ];
+
   const [productData, setProductData] = useState(defaultData[0]);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(FetchProductByDetails(id));
+    }
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (seletedProduct) {
+      setProductData(seletedProduct);
+    }
+  }, [seletedProduct]);
 
   const handlChange = (e) => {
     const { name, value } = e.target;
     setProductData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = e.target.files[0];
+    const formData = new formData();
+    formData.append("image", files);
+
+    try {
+      setUploading(true);
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/upload`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      setProductData((prevData) => ({
+        ...prevData,
+        image: [...prevData.image, { url: data.imageUrl, altText: "" }],
+      }));
+      setUploading(false);
+    } catch (error) {
+      console.error(error);
+      setUploading(false);
+    }
 
     // if (files && files.length > 0) {
     //   const newImages = Array.from(files).map((file) => ({
@@ -48,8 +91,12 @@ const EditProductPage = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log(productData);
+    dispatch(updateProduct(id, productData));
+    navigate("/admin/products");
   };
+
+  if (loading) return <p>Loading cart...</p>;
+  if (error) return <p>Error: {error}</p>;
   return (
     <div className=" max-w-5xl mx-auto p-6 shadow-md rounded-md">
       <h2 className="text-3xl font-bold mb-6">Edit Products</h2>
@@ -178,17 +225,17 @@ const EditProductPage = () => {
 
         {/* color */}
         <div className="mb-6">
-          <label htmlFor="colors" className="block font-semibold mb-2">
+          <label htmlFor="color" className="block font-semibold mb-2">
             Colors
           </label>
           <input
             type="text"
-            name="colors"
-            value={productData.colors}
+            name="color"
+            value={productData.color}
             onChange={(e) =>
               setProductData({
                 ...productData,
-                colors: e.target.value,
+                color: e.target.value,
               })
             }
             placeholder="Enter colors separated by commas"

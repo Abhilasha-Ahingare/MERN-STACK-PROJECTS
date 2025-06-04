@@ -13,7 +13,7 @@ const getAllOrder = async (req, res) => {
 
 const updateAdminOrderDetails = async (req, res) => {
   try {
-    const order = await OrderModel.findById(req.params.id);
+    const order = await OrderModel.findById(req.params.id).populate('user',"name");
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }

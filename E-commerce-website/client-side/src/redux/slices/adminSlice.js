@@ -15,7 +15,7 @@ export const updateUserRole = createAsyncThunk(
   async ({ id, role }, { rejectWithValue }) => {
     try {
       const response = await api.put("/api/admin/user", { id, role });
-      return response.data;
+      return response.data.user;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Failed to update user role" }

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 
 // Fetch orders of the current user
@@ -6,9 +6,9 @@ export const fetchMyOrders = createAsyncThunk(
   "order/fetchMyOrders",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/api/order/myorder");
+      const response = await api.get(`/api/order/myorder`);
       // Ensure the API returns the correct structure.
-      return response.data || []; // If response is an object, ensure you extract data as expected.
+      return response.data  
     } catch (error) {
       return rejectWithValue(
         error.response?.data || { message: "Failed to fetch orders" }
@@ -23,7 +23,6 @@ export const fetchOrderById = createAsyncThunk(
   async (orderId, { rejectWithValue }) => {
     try {
       const response = await api.get(`/api/order/${orderId}`);
-      // Assuming the response contains the full order object, adjust if needed.
       return response.data || {}; // Ensure the API returns the order object as expected.
     } catch (error) {
       return rejectWithValue(
@@ -33,13 +32,36 @@ export const fetchOrderById = createAsyncThunk(
   }
 );
 
+// // Add these selectors before the orderSlice definition
+// export const selectOrderState = (state) => state.orders || { orders: [], loading: false, error: null };
+
+// export const selectOrders = createSelector(
+//   [selectOrderState],
+//   (orderState) => orderState.orders || []
+// );
+
+// export const selectSelectedOrder = createSelector(
+//   [selectOrderState],
+//   (orderState) => orderState.selectedOrder || null
+// );
+
+// export const selectOrderLoading = createSelector(
+//   [selectOrderState],
+//   (orderState) => orderState.loading
+// );
+
+// export const selectOrderError = createSelector(
+//   [selectOrderState],
+//   (orderState) => orderState.error
+// );
+
 const orderSlice = createSlice({
   name: "order",
   initialState: {
-    orders: [],           // List of orders
-    selectedOrder: null,   // Selected order details
-    loading: false,        // Loading state
-    error: null,           // Error state
+    orders: [],
+    selectedOrder: null,
+    loading: false,
+    error: null,
   },
   reducers: {
     clearError: (state) => {
@@ -58,7 +80,8 @@ const orderSlice = createSlice({
       })
       .addCase(fetchMyOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload; // Save the fetched orders in state
+        state.orders = Array.isArray(action.payload) ? action.payload : [];
+        state.error = null;
       })
       .addCase(fetchMyOrders.rejected, (state, action) => {
         state.loading = false;
@@ -72,7 +95,8 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrderById.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedOrder = action.payload; // Save the selected order details
+        state.selectedOrder = action.payload || null;
+        state.error = null;
       })
       .addCase(fetchOrderById.rejected, (state, action) => {
         state.loading = false;
