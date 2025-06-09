@@ -14,7 +14,7 @@ const Login = () => {
   const location = useLocation();
 
   const { cart } = useSelector((state) => state.cart);
-  const { user, guestId } = useSelector((state) => state.auth);
+  const { user, guestId, loading } = useSelector((state) => state.auth);
 
   //get redirect parameter and check if it's checkout or something
   const redirect = new URLSearchParams(location.search).get("redirect") || "/";
@@ -32,12 +32,10 @@ const Login = () => {
     }
   }, [user, guestId, cart, navigate, isCheckoutRedirect, dispatch]);
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
     dispatch(login({ email, password })).then((result) => {
-
       const loggedInUser = result?.payload;
 
       if (cart?.products?.length > 0 && guestId && loggedInUser) {
@@ -108,7 +106,7 @@ const Login = () => {
               type="submit"
               className="w-full bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold "
             >
-              Login
+              {loading ? "loading..." : "login"}
             </button>
             <p className="mt-6 text-center text-sm uppercase">
               {" "}

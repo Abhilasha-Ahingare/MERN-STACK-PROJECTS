@@ -55,7 +55,7 @@ const EditProductPage = () => {
 
   const handleImageChange = async (e) => {
     const files = e.target.files[0];
-    const formData = new formData();
+    const formData = new FormData();
     formData.append("image", files);
 
     try {
@@ -295,6 +295,7 @@ const EditProductPage = () => {
         <div className="mb-6">
           <label className="block font-semibold mb-2">Upload Image</label>
           <input type="file" multiple onChange={handleImageChange} />
+          {uploading && <p>uploading image..</p>}
           <div className="mt-4 flex gap-2">
             {productData.image.map((img, index) => (
               <img
