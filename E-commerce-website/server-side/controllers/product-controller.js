@@ -156,7 +156,7 @@ const deleteProduct = async (req, res) => {
       await product.deleteOne();
       return res
         .status(200)
-        .json({ message: "Product was deleted successfuly " });
+        .json({ message: "product detele sucesffully  " });
     } else {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -288,6 +288,7 @@ const NewArrivals = async (req, res) => {
     } else {
       return res.status(404).json({ message: "we not find best seller" });
     }
+
   } catch (error) {
     return res.status(500).json({
       message: "Server Error",
